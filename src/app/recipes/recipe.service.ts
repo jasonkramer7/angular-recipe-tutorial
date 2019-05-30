@@ -9,26 +9,7 @@ import { Subject } from "rxjs";
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      'Grilled Salmon', 
-      'A simple grilled salmon anyone can make', 
-      'https://hips.hearstapps.com/del.h-cdn.co/assets/18/11/1520957651-grilled-salmon-vertical.jpg',
-      [
-        new Ingredient('Salmon', 2),
-        new Ingredient('Butter', 4)
-      ]),
-    new Recipe(
-      'Shredded Chicken Tacos', 
-      'A tasty shredded chicken mole taco', 
-      'https://www.wellplated.com/wp-content/uploads/2018/05/Instant-Pot-Shredded-Chicken-Mole-Tacos-600x714.jpg',
-      [
-        new Ingredient('Chicken', 3),
-        new Ingredient('Tortilla', 3),
-        new Ingredient('Lime', 4),
-        new Ingredient('Fetta Cheese', 1)
-      ])
-  ];
+  private recipes: Recipe[] = [];
 
   constructor(private slService: ShoppingListService){}
 
@@ -42,6 +23,11 @@ export class RecipeService {
 
   addIngredientsToShoppingList(ingredients: Ingredient[]) {
     this.slService.addIngredients(ingredients);
+  }
+
+  setRecipes(recipes: Recipe[]){
+    this.recipes = recipes;
+    this.recipesChanged.next(this.recipes.slice());
   }
 
   addRecipe(recipe: Recipe) {
@@ -58,4 +44,5 @@ export class RecipeService {
     this.recipes.splice(index, 1);
     this.recipesChanged.next(this.recipes.slice());
   }
+
 }
