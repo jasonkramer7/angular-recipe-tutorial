@@ -15,6 +15,8 @@ import { ShoppingListComponent } from './shopping-list/shopping-list.component';
 import { ShoppingEditComponent } from './shopping-list/shopping-edit/shopping-edit.component';
 import { RecipeStartComponent } from "./recipes/recipe-start/recipe-start.component";
 import { RecipeEditComponent } from "./recipes/recipe-edit/recipe-edit.component";
+import { AuthComponent } from './auth/auth.component';
+import { LoadingSpinnerComponent } from  './shared/loading-spinner/loading-spinner.component';
 
 import { DropdownDirective } from "./shared/dropdown.directive";
 
@@ -22,7 +24,7 @@ import { ShoppingListService } from "./shopping-list/shopping-list.service";
 import { RecipeService } from "./recipes/recipe.service";
 import { DataStorageService } from "./shared/data-storage.service";
 import { RecipesResolverService }  from "./recipes/recipes-resolver.service";
-
+import { AuthService } from "./auth/auth.service";
 @NgModule({
   imports:      [ 
     BrowserModule, 
@@ -43,9 +45,17 @@ import { RecipesResolverService }  from "./recipes/recipes-resolver.service";
    ShoppingEditComponent,
    RecipeStartComponent,
    RecipeEditComponent,
+   AuthComponent,
+   LoadingSpinnerComponent,
    DropdownDirective
    ],
-  providers: [ShoppingListService, RecipeService, DataStorageService, RecipesResolverService],
+  providers: [
+    ShoppingListService, 
+    RecipeService, 
+    DataStorageService, 
+    RecipesResolverService, 
+    AuthService
+    ],
   bootstrap:    [ AppComponent 
   ]
 })
