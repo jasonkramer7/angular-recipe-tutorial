@@ -25,52 +25,76 @@ export class AuthService {
   signup(email: string, password: string) {
     return this.http.post<AuthResponseData>('https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAQ1xx6C0cKoObKe_YM1PBg8Qo03PIb2qo',
     {
-      email: email,
-      password: password,
-      returnSecureToken: true
-    })
-    .pipe(catchError(this.handleError), tap(resData => {
-      this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
-    }));
+          email: email,
+          password: password,
+          returnSecureToken: true
+        }
+      )
+      .pipe(
+        catchError(this.handleError),
+        tap(resData => {
+          this.handleAuthentication(
+            resData.email,
+            resData.localId,
+            resData.idToken,
+            +resData.expiresIn
+          );
+        })
+      );
   }
 
   login(email: string, password: string) {
     return this.http.post<AuthResponseData>('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyAQ1xx6C0cKoObKe_YM1PBg8Qo03PIb2qo',
-     {
-      email: email,
-      password: password,
-      returnSecureToken: true
-    })
-    .pipe(catchError(this.handleError), tap(resData => {
-      this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
-    }));
+    {
+          email: email,
+          password: password,
+          returnSecureToken: true
+        }
+      )
+      .pipe(
+        catchError(this.handleError),
+        tap(resData => {
+          this.handleAuthentication(
+            resData.email,
+            resData.localId,
+            resData.idToken,
+            +resData.expiresIn
+          );
+        })
+      );
   }
 
   autoLogin() {
-    const userData: {
-      email: string,
-      id: string,
-      _token: string,
-      _tokenExpirationDate: string,
-
+   const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _tokenExpirationDate: string;
     } = JSON.parse(localStorage.getItem('userData'));
-    if(!userData){
+    if (!userData) {
       return;
     }
 
-    const loadedUser = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate));
+    const loadedUser = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._tokenExpirationDate)
+    );
 
-    if(loadedUser.token){
+    if (loadedUser._token) {
       this.user.next(loadedUser);
-      const expiration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
-      this.autoLogout(expiration * 1000);
+      const expirationDuration =
+        new Date(userData._tokenExpirationDate).getTime() -
+        new Date().getTime();
+      this.autoLogout(expirationDuration);
     }
   }
 
   logout() {
     this.user.next(null);
     this.router.navigate(["./auth"]);
-    localStorage.clear();
+    localStorage.removeItem('userData');
     if(this.tokenTimer) {
       clearTimeout(this.tokenTimer);
     }

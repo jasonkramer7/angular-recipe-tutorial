@@ -9,12 +9,17 @@ import { RecipeService } from "../recipes/recipe.service";
 
 @Injectable()
 export class DataStorageService {
-  constructor(private http: HttpClient, private recipeService: RecipeService, private authService: AuthService){}
+  constructor(
+    private http: HttpClient, 
+    private recipeService: RecipeService,
+    private authService: AuthService
+    ){}
 
   storeRecipes() {
     const recipes = this.recipeService.getRecipes();
     this.http.put('https://recipe-b2dc7.firebaseio.com/recipes.json', recipes)
     .subscribe(response => {
+       console.log(response);
     });
   }
 

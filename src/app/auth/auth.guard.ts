@@ -7,14 +7,13 @@ import { map, take } from "rxjs/operators";
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-  constructor(private authService: AuthService, private router: Router){}
+constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(route: ActivatedRouteSnapshot, router: RouterStateSnapshot): boolean | Promise<boolean> | Observable<boolean| UrlTree> {
-   return this.authService.user.pipe
+  canActivate(route: ActivatedRouteSnapshot, router: RouterStateSnapshot): boolean | Promise<boolean| UrlTree>| UrlTree | Observable<boolean| UrlTree> {
+   return this.authService.user.pipe(
    take(1),
-   (map 
+   map 
     (user => {
-      debugger;
      const isAuth = !!user;
      if(isAuth){
        return true;
