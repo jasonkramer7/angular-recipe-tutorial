@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from "./app-routing.module";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 
 import { AppComponent } from './app.component';
 import { HelloComponent } from './hello.component';
@@ -25,6 +25,9 @@ import { RecipeService } from "./recipes/recipe.service";
 import { DataStorageService } from "./shared/data-storage.service";
 import { RecipesResolverService }  from "./recipes/recipes-resolver.service";
 import { AuthService } from "./auth/auth.service";
+import { AuthInterceptorService } from "./auth/auth-interceptor.service";
+import { AuthGuard } from "./auth/auth.guard";
+
 @NgModule({
   imports:      [ 
     BrowserModule, 
@@ -54,8 +57,9 @@ import { AuthService } from "./auth/auth.service";
     RecipeService, 
     DataStorageService, 
     RecipesResolverService, 
-    AuthService
-    ],
+    AuthService,
+    AuthGuard,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true }],
   bootstrap:    [ AppComponent 
   ]
 })
