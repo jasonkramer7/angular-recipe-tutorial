@@ -17,6 +17,7 @@ import { RecipeStartComponent } from "./recipes/recipe-start/recipe-start.compon
 import { RecipeEditComponent } from "./recipes/recipe-edit/recipe-edit.component";
 import { AuthComponent } from './auth/auth.component';
 import { LoadingSpinnerComponent } from  './shared/loading-spinner/loading-spinner.component';
+import { AlertComponent } from "./shared/alert/alert.component";
 
 import { DropdownDirective } from "./shared/dropdown.directive";
 
@@ -50,6 +51,7 @@ import { AuthGuard } from "./auth/auth.guard";
    RecipeEditComponent,
    AuthComponent,
    LoadingSpinnerComponent,
+   AlertComponent,
    DropdownDirective
    ],
   providers: [
@@ -60,7 +62,6 @@ import { AuthGuard } from "./auth/auth.guard";
     AuthService,
     AuthGuard,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true }],
-  bootstrap:    [ AppComponent 
-  ]
+  bootstrap:    [ AppComponent ]
 })
 export class AppModule { }
