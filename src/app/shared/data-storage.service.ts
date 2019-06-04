@@ -8,6 +8,8 @@ import { AuthService } from '../auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class DataStorageService {
+  url = 'ttps://recipe-b2dc7.firebaseio.com/recipes.json';
+
   constructor(
     private http: HttpClient,
     private recipeService: RecipeService,
@@ -18,7 +20,7 @@ export class DataStorageService {
     const recipes = this.recipeService.getRecipes();
     this.http
       .put(
-        'https://ng-course-recipe-book-65f10.firebaseio.com/recipes.json',
+        this.url,
         recipes
       )
       .subscribe(response => {
@@ -29,7 +31,7 @@ export class DataStorageService {
   fetchRecipes() {
     return this.http
       .get<Recipe[]>(
-        'https://ng-course-recipe-book-65f10.firebaseio.com/recipes.json'
+        this.url
       )
       .pipe(
         map(recipes => {
