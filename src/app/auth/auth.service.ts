@@ -1,9 +1,10 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { catchError, tap } from "rxjs/operators";
-import { throwError, BehaviorSubject } from "rxjs";
-import { User } from "./user.model";
-import { Router } from "@angular/router";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError, BehaviorSubject } from 'rxjs';
+
+import { User } from './user.model';
 
 export interface AuthResponseData {
   kind: string;
@@ -15,16 +16,18 @@ export interface AuthResponseData {
   registered?: boolean;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   user = new BehaviorSubject<User>(null);
-  private tokenTimer: any;
-  
+  private tokenExpirationTimer: any;
+
   constructor(private http: HttpClient, private router: Router) {}
-  
+
   signup(email: string, password: string) {
-    return this.http.post<AuthResponseData>('https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAQ1xx6C0cKoObKe_YM1PBg8Qo03PIb2qo',
-    {
+    return this.http
+      .post<AuthResponseData>(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDb0xTaRAoxyCgvaDF3kk5VYOsTwB_3o7Y',
+        {
           email: email,
           password: password,
           returnSecureToken: true
@@ -44,8 +47,10 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<AuthResponseData>('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyAQ1xx6C0cKoObKe_YM1PBg8Qo03PIb2qo',
-    {
+    return this.http
+      .post<AuthResponseData>(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDb0xTaRAoxyCgvaDF3kk5VYOsTwB_3o7Y',
+        {
           email: email,
           password: password,
           returnSecureToken: true
@@ -65,7 +70,7 @@ export class AuthService {
   }
 
   autoLogin() {
-   const userData: {
+    const userData: {
       email: string;
       id: string;
       _token: string;
@@ -82,7 +87,7 @@ export class AuthService {
       new Date(userData._tokenExpirationDate)
     );
 
-    if (loadedUser._token) {
+    if (loadedUser.token) {
       this.user.next(loadedUser);
       const expirationDuration =
         new Date(userData._tokenExpirationDate).getTime() -
@@ -93,48 +98,49 @@ export class AuthService {
 
   logout() {
     this.user.next(null);
-    this.router.navigate(["./auth"]);
+    this.router.navigate(['/auth']);
     localStorage.removeItem('userData');
-    if(this.tokenTimer) {
-      clearTimeout(this.tokenTimer);
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
     }
-    this.tokenTimer = null;
+    this.tokenExpirationTimer = null;
   }
 
   autoLogout(expirationDuration: number) {
-    this.tokenTimer = setTimeout(() => {
+    this.tokenExpirationTimer = setTimeout(() => {
       this.logout();
-    }, expirationDuration );
+    }, expirationDuration);
   }
 
-  private handleAuthentication( email: string, userId: string, token: string, expiresIn: number){
-     const expiriationDate = new Date(new Date().getTime() + expiresIn * 1000);
-      const user = new User(email, userId, token, expiriationDate);
-      this.user.next(user);
-      this.autoLogout(expiresIn * 1000);
-      localStorage.setItem('userData', JSON.stringify(user));
+  private handleAuthentication(
+    email: string,
+    userId: string,
+    token: string,
+    expiresIn: number
+  ) {
+    const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+    const user = new User(email, userId, token, expirationDate);
+    this.user.next(user);
+    this.autoLogout(expiresIn * 1000);
+    localStorage.setItem('userData', JSON.stringify(user));
   }
 
-  private handleError(erroResponse: HttpErrorResponse){
-    let errorMessage = 'Unknown Error';
-     if (!erroResponse.error || !erroResponse.error.error) {
+  private handleError(errorRes: HttpErrorResponse) {
+    let errorMessage = 'An unknown error occurred!';
+    if (!errorRes.error || !errorRes.error.error) {
       return throwError(errorMessage);
     }
-    switch (erroResponse.error.error.message) {
+    switch (errorRes.error.error.message) {
       case 'EMAIL_EXISTS':
-        errorMessage = "This email exists already";
-        break;
-      case 'INVALID_PASSWORD':
-        errorMessage = "Password is invalid";
-        break;
-      case 'USER_DISABLED':
-        errorMessage = "Account is disabled";
+        errorMessage = 'This email exists already';
         break;
       case 'EMAIL_NOT_FOUND':
-        errorMessage = "Email is not found";
+        errorMessage = 'This email does not exist.';
         break;
-      }
+      case 'INVALID_PASSWORD':
+        errorMessage = 'This password is not correct.';
+        break;
+    }
     return throwError(errorMessage);
   }
-
 }
